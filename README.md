@@ -1,1 +1,1 @@
-# hotel website for uni
+# Hotel website for uni
