@@ -20,21 +20,19 @@ class RoomListView(ListView):
 
     filterset_class = RoomFilter
 
+   
     def get_queryset(self):
         qs = super().get_queryset()
+
         data = self.request.GET.copy()
 
-        if 'is_available' not in data:
-            data['is_available'] = 'True'
-
-        
         self.filterset = self.filterset_class(data, queryset=qs)
 
         return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter_form'] = RoomFilterForm(self.request.GET or {'is_available': True})
+        context['filter_form'] = RoomFilterForm(self.request.GET)
         context['filterset']   = self.filterset
         return context
 

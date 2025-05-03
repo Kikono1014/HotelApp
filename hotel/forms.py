@@ -10,4 +10,4 @@ class RoomFilterForm(forms.Form):
     max_capacity = forms.IntegerField(required=False, min_value=1, label="Max Capacity")
     min_price = forms.DecimalField(required=False, min_value=0, decimal_places=2, label="Min Price")
     max_price = forms.DecimalField(required=False, min_value=0, decimal_places=2, label="Max Price")
-    is_available = forms.BooleanField(required=False, initial=False, label="Only Available")
+    only_available = forms.BooleanField(required=False, initial=False, label="Only Available")
