@@ -1,7 +1,27 @@
-{# templates/rooms/room_list.html #}
 {% extends "base.html" %}
 {% block content %}
-  <h1>Available Rooms</h1>
+  <h1>Rooms</h1>
+
+  <form method="get" class="room-filter-form">
+    {{ filter_form.non_field_errors }}
+    <div>
+      {{ filter_form.room_type.label_tag }} {{ filter_form.room_type }}
+    </div>
+    <div>
+      {{ filter_form.min_capacity.label_tag }} {{ filter_form.min_capacity }}
+      {{ filter_form.max_capacity.label_tag }} {{ filter_form.max_capacity }}
+    </div>
+    <div>
+      {{ filter_form.min_price.label_tag }} {{ filter_form.min_price }}
+      {{ filter_form.max_price.label_tag }} {{ filter_form.max_price }}
+    </div>
+    <div>
+      {{ filter_form.is_available }} {{ filter_form.is_available.label_tag }}
+    </div>
+    <button type="submit">Apply Filters</button>
+  </form>
+
+  <hr>
 
   <ul>
     {% for room in rooms %}
@@ -9,24 +29,21 @@
         <a href="{% url 'detail' room.pk %}">
           Room {{ room.room_number }} — {{ room.get_room_type_display }}
         </a>
-        {% if not room.is_available %}
-          <span style="color: #c00;">(Unavailable)</span>
-        {% endif %}
+        {% if not room.is_available %}<small>(Unavailable)</small>{% endif %}
       </li>
     {% empty %}
-      <li>No rooms found.</li>
+      <li>No rooms match your criteria.</li>
     {% endfor %}
   </ul>
 
-  {# Pagination controls, if using paginate_by #}
   {% if is_paginated %}
     <div class="pagination">
       {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">« Prev</a>
+        <a href="{% querystring page=page_obj.previous_page_number %}">« Prev</a>
       {% endif %}
       <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
       {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Next »</a>
+        <a href="{% querystring page=page_obj.next_page_number %}">Next »</a>
       {% endif %}
     </div>
   {% endif %}
