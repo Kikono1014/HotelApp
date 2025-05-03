@@ -1,0 +1,21 @@
+{# templates/rooms/room_detail.html #}
+{% extends "base.html" %}
+{% block content %}
+  <h1>Room {{ room.room_number }}</h1>
+  <p><strong>Type:</strong> {{ room.get_room_type_display }}</p>
+  <p><strong>Capacity:</strong> {{ room.capacity }} guest{{ room.capacity|pluralize }}</p>
+  <p><strong>Price per night:</strong> ${{ room.price_per_night }}</p>
+  {% if room.description %}
+    <p><strong>Description:</strong> {{ room.description }}</p>
+  {% endif %}
+  <p>
+    <strong>Status:</strong>
+    {% if room.is_available %}
+      <span style="color: green;">Available</span>
+    {% else %}
+      <span style="color: red;">Booked</span>
+    {% endif %}
+  </p>
+
+  <p><a href="{% url 'list' %}">« Back to room list</a></p>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block title %}
+    <title>My Site</title>
+    {% endblock %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/rooms/">Rooms</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Default content can go here, or be empty -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; HotelA</p>
+        {% block extra_footer %}{% endblock %}
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
