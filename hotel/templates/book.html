@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Book Room {{ room.room_number }}</h1>
+  <p><strong>Type:</strong> {{ room.get_room_type_display }}</p>
+  <p><strong>Price per night:</strong> ${{ room.price_per_night }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div>
+      <label for="id_first_name">First Name:</label>
+      {{ form.first_name }}
+    </div>
+    <div>
+      <label for="id_last_name">Last Name:</label>
+      {{ form.last_name }}
+    </div>
+    <div>
+      <label for="id_email">Email:</label>
+      {{ form.email }}
+    </div>
+    <div>
+      <label for="id_phone">Phone (optional):</label>
+      {{ form.phone }}
+    </div>
+    <div>
+      <label for="id_check_in_date">Check-in Date:</label>
+      {{ form.check_in_date }}
+    </div>
+    <div>
+      <label for="id_check_out_date">Check-out Date:</label>
+      {{ form.check_out_date }}
+    </div>
+    <div>
+      <label for="id_notes">Additional Notes (optional):</label>
+      {{ form.notes }}
+    </div>
+
+    {% if form.errors %}
+      <div style="color: red;">
+        <p>Please correct the following errors:</p>
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <button type="submit" style="color: white; background-color: green; padding: 8px 16px; border-radius: 4px;">Confirm Booking</button>
+  </form>
+
+  <p><a href="{% url 'detail' room.pk %}">« Back to room details</a></p>
+{% endblock %}
