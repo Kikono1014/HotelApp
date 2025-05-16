@@ -15,9 +15,9 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t Hotel_App .
+        docker build -t hotel-app .
 
     - name: Run tests in Docker container
       run: |
-        docker run --rm Hotel_App python manage.py test --parallel
+        docker run --rm hotel-app python manage.py test --parallel
     
