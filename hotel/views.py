@@ -73,11 +73,6 @@ class BookingCreateView(CreateView):
         booking.booking_channel = 'online'
         booking.save()
 
-        active_bookings = Booking.objects.filter(
-            room=room,
-            status__in=['confirmed', 'checked_in']
-        ).exists()
-        room.is_available = not active_bookings
         room.save()
 
         return super().form_valid(form)

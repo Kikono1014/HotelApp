@@ -11,7 +11,12 @@ class RoomFilterForm(forms.Form):
     max_capacity = forms.IntegerField(required=False, min_value=1, label="Max Capacity")
     min_price = forms.DecimalField(required=False, min_value=0, decimal_places=2, label="Min Price")
     max_price = forms.DecimalField(required=False, min_value=0, decimal_places=2, label="Max Price")
-    only_available = forms.BooleanField(required=False, initial=False, label="Only Available")
+    only_available = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Only Available",
+        widget=forms.CheckboxInput(attrs={'value': 'true'})
+    )
 
 class BookingForm(forms.ModelForm):
     first_name = forms.CharField(max_length=50, label="First Name")

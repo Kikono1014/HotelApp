@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from datetime import date, timedelta
+from django.utils import timezone
 
 class Room(models.Model):
     class RoomType(models.TextChoices):
@@ -20,7 +21,18 @@ class Room(models.Model):
     capacity = models.PositiveSmallIntegerField()
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True, null=True)
-    is_available = models.BooleanField(default=True)
+    # is_available = models.BooleanField(default=True)
+
+    @property
+    def is_available(self):
+        today = timezone.localdate()
+        return not Booking.objects.filter(
+            room=self,
+            status__in=[Booking.BookingStatus.CONFIRMED, Booking.BookingStatus.CHECKED_IN],
+            check_in_date__lte=today,
+            check_out_date__gte=today,
+        ).exists()
+    
 
     def __str__(self):
         return f"Room {self.room_number} ({self.room_type})"
