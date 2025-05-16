@@ -19,20 +19,17 @@ class BookingForm(forms.ModelForm):
     email = forms.EmailField(label="Email")
     phone = forms.CharField(max_length=20, required=False, label="Phone")
 
-    # Нове поле для вибору періоду
-    available_period = forms.ChoiceField(
-        choices=[],
-        required=True,
-        label="Select Available Period"
-    )
-
     class Meta:
         model = Booking
-        fields = ['notes']
+        fields = ['check_in_date', 'check_out_date', 'notes']
         widgets = {
+            'check_in_date': forms.DateInput(attrs={'type': 'date'}),
+            'check_out_date': forms.DateInput(attrs={'type': 'date'}),
             'notes': forms.Textarea(attrs={'rows': 4}),
         }
         labels = {
+            'check_in_date': 'Check-in Date',
+            'check_out_date': 'Check-out Date',
             'notes': 'Additional Notes (optional)',
         }
 
@@ -40,38 +37,50 @@ class BookingForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.room = room
         if room:
-            # Заповнюємо вибір періодів
+            # Set min and max dates based on available periods
+            today = date.today()
+            max_date = today + timedelta(days=30)
             periods = room.get_available_periods()
-            choices = [
-                (
-                    f"{period[0]}:{period[1]}",
-                    f"{period[0]} to {period[1]}"
-                )
-                for period in periods
-            ]
-            self.fields['available_period'].choices = choices
+            if periods:
+                # Use the earliest available date as the minimum
+                min_date = periods[0][0]
+                self.fields['check_in_date'].widget.attrs.update({
+                    'min': min_date.isoformat(),
+                    'max': max_date.isoformat()
+                })
+                self.fields['check_out_date'].widget.attrs.update({
+                    'min': (min_date + timedelta(days=1)).isoformat(),
+                    'max': max_date.isoformat()
+                })
 
     def clean(self):
         cleaned_data = super().clean()
-        available_period = cleaned_data.get('available_period')
+        check_in_date = cleaned_data.get('check_in_date')
+        check_out_date = cleaned_data.get('check_out_date')
 
-        if available_period:
-            # Розпарсуємо вибраний період
-            check_in_str, check_out_str = available_period.split(':')
-            check_in_date = date.fromisoformat(check_in_str)
-            check_out_date = date.fromisoformat(check_out_str)
-
-            # Перевірка: дата виїзду після дати заїзду
+        if check_in_date and check_out_date:
+            # Check if check-out is after check-in
             if check_out_date <= check_in_date:
                 raise forms.ValidationError("Check-out date must be after check-in date.")
 
-            # Перевірка: максимум 30 днів наперед
+            # Check if dates are within 30 days
             max_date = date.today() + timedelta(days=30)
             if check_in_date > max_date or check_out_date > max_date:
                 raise forms.ValidationError("Bookings can only be made up to 30 days in advance.")
 
-            # Перевірка: чи період дійсно вільний
+            # Check if the selected range falls within an available period
             if self.room:
+                periods = self.room.get_available_periods()
+                is_valid_period = False
+                for period in periods:
+                    period_start, period_end = period
+                    if (check_in_date >= period_start and check_out_date <= period_end):
+                        is_valid_period = True
+                        break
+                if not is_valid_period:
+                    raise forms.ValidationError("Selected dates are not within an available period.")
+
+                # Check for overlapping bookings
                 conflicting_bookings = Booking.objects.filter(
                     room=self.room,
                     status__in=['confirmed', 'checked_in'],
@@ -79,10 +88,6 @@ class BookingForm(forms.ModelForm):
                     check_out_date__gt=check_in_date
                 ).exists()
                 if conflicting_bookings:
-                    raise forms.ValidationError("Selected period is no longer available.")
-
-            # Додаємо очищені дати до cleaned_data
-            cleaned_data['check_in_date'] = check_in_date
-            cleaned_data['check_out_date'] = check_out_date
+                    raise forms.ValidationError("Room is not available for the selected dates.")
 
         return cleaned_data

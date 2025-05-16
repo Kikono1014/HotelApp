@@ -5,6 +5,15 @@
   <p><strong>Price per night:</strong> ${{ room.price_per_night }}</p>
   <p><strong>Next available:</strong> {{ room.get_next_available_date|date:"Y-m-d" }}</p>
 
+  <h3>Available Periods:</h3>
+  <ul>
+    {% for period in available_periods %}
+      <li>{{ period.0|date:"Y-m-d" }} to {{ period.1|date:"Y-m-d" }}</li>
+    {% empty %}
+      <li>No available periods in the next 30 days.</li>
+    {% endfor %}
+  </ul>
+
   <form method="post">
     {% csrf_token %}
     <div>
@@ -12,7 +21,7 @@
       {{ form.first_name }}
     </div>
     <div>
-      <label for="id_last_name">Last Name:</label>
+      <label for="id_last W_name">Last Name:</label>
       {{ form.last_name }}
     </div>
     <div>
@@ -20,12 +29,16 @@
       {{ form.email }}
     </div>
     <div>
- CENTERED      <label for="id_phone">Phone (optional):</label>
+      <label for="id_phone">Phone (optional):</label>
       {{ form.phone }}
     </div>
     <div>
-      <label for="id_available_period">Available Period:</label>
-      {{ form.available_period }}
+      <label for="id_check_in_date">Check-in Date:</label>
+      {{ form.check_in_date }}
+    </div>
+    <div>
+      <label for="id_check_out_date">Check-out Date:</label>
+      {{ form.check_out_date }}
     </div>
     <div>
       <label for="id_notes">Additional Notes (optional):</label>

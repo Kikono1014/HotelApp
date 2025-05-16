@@ -50,7 +50,9 @@ class BookingCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['room'] = Room.objects.get(pk=self.kwargs['pk'])
+        room = Room.objects.get(pk=self.kwargs['pk'])
+        context['room'] = room
+        context['available_periods'] = room.get_available_periods()
         return context
 
     def form_valid(self, form):
@@ -67,13 +69,10 @@ class BookingCreateView(CreateView):
         booking = form.save(commit=False)
         booking.room = room
         booking.guest = guest
-        booking.check_in_date = form.cleaned_data['check_in_date']
-        booking.check_out_date = form.cleaned_data['check_out_date']
         booking.status = 'confirmed'
         booking.booking_channel = 'online'
         booking.save()
 
-        # Оновлюємо статус кімнати
         active_bookings = Booking.objects.filter(
             room=room,
             status__in=['confirmed', 'checked_in']
