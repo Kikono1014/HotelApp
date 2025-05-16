@@ -3,6 +3,7 @@
   <h1>Book Room {{ room.room_number }}</h1>
   <p><strong>Type:</strong> {{ room.get_room_type_display }}</p>
   <p><strong>Price per night:</strong> ${{ room.price_per_night }}</p>
+  <p><strong>Next available:</strong> {{ room.get_next_available_date|date:"Y-m-d" }}</p>
 
   <form method="post">
     {% csrf_token %}
@@ -19,16 +20,12 @@
       {{ form.email }}
     </div>
     <div>
-      <label for="id_phone">Phone (optional):</label>
+ CENTERED      <label for="id_phone">Phone (optional):</label>
       {{ form.phone }}
     </div>
     <div>
-      <label for="id_check_in_date">Check-in Date:</label>
-      {{ form.check_in_date }}
-    </div>
-    <div>
-      <label for="id_check_out_date">Check-out Date:</label>
-      {{ form.check_out_date }}
+      <label for="id_available_period">Available Period:</label>
+      {{ form.available_period }}
     </div>
     <div>
       <label for="id_notes">Additional Notes (optional):</label>

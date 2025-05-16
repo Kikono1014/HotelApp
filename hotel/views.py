@@ -1,3 +1,4 @@
+# hotel/views.py
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
@@ -42,16 +43,18 @@ class BookingCreateView(CreateView):
     template_name = 'book.html'
     success_url = reverse_lazy('list')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['room'] = Room.objects.get(pk=self.kwargs['pk'])
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['room'] = Room.objects.get(pk=self.kwargs['pk'])
         return context
 
     def form_valid(self, form):
-        # Отримуємо номер
         room = Room.objects.get(pk=self.kwargs['pk'])
-
-        # Створюємо або отримуємо гостя
         guest, created = Guest.objects.get_or_create(
             email=form.cleaned_data['email'],
             defaults={
@@ -61,16 +64,21 @@ class BookingCreateView(CreateView):
             }
         )
 
-        # Створюємо бронювання
-        booking = form.save(commit=False)  # Не зберігаємо одразу
+        booking = form.save(commit=False)
         booking.room = room
         booking.guest = guest
+        booking.check_in_date = form.cleaned_data['check_in_date']
+        booking.check_out_date = form.cleaned_data['check_out_date']
         booking.status = 'confirmed'
         booking.booking_channel = 'online'
         booking.save()
 
-        # Оновлюємо статус номера
-        room.is_available = False
+        # Оновлюємо статус кімнати
+        active_bookings = Booking.objects.filter(
+            room=room,
+            status__in=['confirmed', 'checked_in']
+        ).exists()
+        room.is_available = not active_bookings
         room.save()
 
         return super().form_valid(form)

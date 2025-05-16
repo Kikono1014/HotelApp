@@ -1,4 +1,7 @@
+# hotel/models.py
 from django.db import models
+from django.utils import timezone
+from datetime import date, timedelta
 
 class Room(models.Model):
     class RoomType(models.TextChoices):
@@ -8,38 +11,67 @@ class Room(models.Model):
         FAMILY = 'family', 'Family'
         DELUXE = 'deluxe', 'Deluxe'
     
-    # Показне ім’я номера
     room_number = models.CharField(max_length=10, unique=True)
-    # Тип кімнати
     room_type = models.CharField(
         max_length=10,
         choices=RoomType.choices,
         default=RoomType.SINGLE,
     )
-    # Максимальна кількість гостей
     capacity = models.PositiveSmallIntegerField()
-    # Ціна за ніч
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
-    # Опис чи особливості
     description = models.TextField(blank=True, null=True)
-    # Доступність для бронювання
     is_available = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Room {self.room_number} ({self.room_type})"
 
+    def get_next_available_date(self):
+        today = date.today()
+        bookings = Booking.objects.filter(
+            room=self,
+            status__in=['confirmed', 'checked_in'],
+            check_out_date__gte=today
+        ).order_by('check_out_date')
+        
+        if not bookings.exists():
+            return today
+        
+        last_booking = bookings.last()
+        return last_booking.check_out_date
+
+    def get_available_periods(self, max_days=30):
+        today = date.today()
+        max_date = today + timedelta(days=max_days)
+        bookings = Booking.objects.filter(
+            room=self,
+            status__in=['confirmed', 'checked_in'],
+            check_out_date__gte=today,
+            check_in_date__lte=max_date
+        ).order_by('check_in_date')
+
+        periods = []
+        current_date = today
+
+        if not bookings.exists():
+            return [(today, max_date)]
+
+        for booking in bookings:
+            if current_date < booking.check_in_date:
+                periods.append((current_date, booking.check_in_date))
+            current_date = max(current_date, booking.check_out_date)
+
+        if current_date < max_date:
+            periods.append((current_date, max_date))
+
+        return periods
+
     class Meta:
         ordering = ['room_number']
 
-
 class Guest(models.Model):
-    # Ім’я гостя
     first_name = models.CharField(max_length=50)
-    # Прізвище
     last_name = models.CharField(max_length=50)
-    # Email
     email = models.EmailField(unique=True)
-    # Телефон
     phone = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
@@ -47,7 +79,6 @@ class Guest(models.Model):
 
     class Meta:
         ordering = ['last_name', 'first_name']
-
 
 class Booking(models.Model):
     class BookingStatus(models.TextChoices):
@@ -62,29 +93,21 @@ class Booking(models.Model):
         IN_PERSON  = 'in_person', 'In Person'
         AGENT      = 'agent', 'Travel Agent'
 
-    # Номер, що бронюється :contentReference[oaicite:0]{index=0}
-    room = models.ForeignKey(Room,  on_delete=models.CASCADE)
-    # Гість, що робить бронювання :contentReference[oaicite:1]{index=1}
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     guest = models.ForeignKey(Guest, on_delete=models.CASCADE)
-    # Дата заїзду
     check_in_date = models.DateField()
-    # Дата виїзду
     check_out_date = models.DateField()
-    # Коли створено бронювання
     booking_date = models.DateTimeField(auto_now_add=True)
-    # Статус 
-    status          = models.CharField(
+    status = models.CharField(
         max_length=12,
         choices=BookingStatus.choices,
         default=BookingStatus.CONFIRMED,
     )
-    # Спосіб бронювання
     booking_channel = models.CharField(
         max_length=10,
         choices=BookingChannel.choices,
         default=BookingChannel.ONLINE,
     )
-    # Додаткова інформація
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):

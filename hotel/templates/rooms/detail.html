@@ -10,14 +10,25 @@
   <p>
     <strong>Status:</strong>
     {% if room.is_available %}
-      <span style="color: green;">Available</span>
+      <span style="color: green;">Available now</span>
     {% else %}
-      <span style="color: red;">Booked</span>
+      <span style="color: red;">Booked until {{ room.get_next_available_date|date:"Y-m-d" }}</span>
     {% endif %}
   </p>
+  <p><strong>Available Periods:</strong></p>
+  <ul>
+    {% for period in room.get_available_periods %}
+      <li>{{ period.0|date:"Y-m-d" }} to {{ period.1|date:"Y-m-d" }}</li>
+    {% empty %}
+      <li>No available periods in the next 30 days.</li>
+    {% endfor %}
+  </ul>
 
-  {% if room.is_available %}
-    <p><a href="{% url 'book' room.pk %}" style="color: white; background-color: green; padding: 8px 16px; border-radius: 4px; text-decoration: none;">Book Now</a></p>
-  {% endif %}
+  <p>
+    <a href="{% url 'book' room.pk %}" 
+       style="color: white; background-color: green; padding: 8px 16px; border-radius: 4px; text-decoration: none;">
+       Book Now
+    </a>
+  </p>
   <p><a href="{% url 'list' %}">« Back to room list</a></p>
 {% endblock %}
