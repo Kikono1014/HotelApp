@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Скасувати бронювання{% endblock %}
+{% block content %}
+  <h2>Ви впевнені, що хочете скасувати бронювання №{{ object.pk }}?</h2>
+  <form method="post">{% csrf_token %}
+    <button type="submit" class="btn btn-danger">Так, скасувати</button>
+    <a href="{% url 'booking_list' %}" class="btn btn-secondary">Скасувати</a>
+  </form>
+{% endblock %}

@@ -9,5 +9,5 @@
 <p><strong>Status:</strong> {{ booking.status }}</p>
 <p><strong>Notes:</strong> {{ booking.notes }}</p>
 
-<a href="{% url 'booking_cancel' booking.pk %}" class="btn btn-danger">Cancel Booking</a>
+<a href="{% url 'cancel_booking' booking.pk %}" class="btn btn-danger">Cancel Booking</a>
 {% endblock %}

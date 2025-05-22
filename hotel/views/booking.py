@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, View
 from django.views.generic.edit import CreateView
+from django.views.generic.edit import DeleteView
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -21,22 +22,15 @@ class BookingDetailView(DetailView):
     template_name = 'bookings/booking_detail.html'
     context_object_name = 'booking'
 
-class BookingCancelView(View):
-    def post(self, request, pk):
-        booking = get_object_or_404(Booking, pk=pk)
-        if booking.status == 'confirmed':
-            booking.status = 'canceled'
-            booking.save()
-            messages.success(request, 'Бронювання успішно скасовано.')
-        else:
-            messages.warning(request, 'Бронювання вже скасовано або недійсне.')
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
+class BookingCancelView(DeleteView):
+    model = Booking
+    template_name = 'bookings/confirm_cancel.html'  
+    success_url = reverse_lazy('booking_list') 
 
 class BookingCreateView(CreateView):
     form_class = BookingForm
-    template_name = 'booking/book.html'
-    success_url = reverse_lazy('list')
+    template_name = 'bookings/book.html'
+    success_url = reverse_lazy('booking_list')
 
     def dispatch(self, request, *args, **kwargs):
         self.room = get_object_or_404(Room, pk=self.kwargs['pk'])

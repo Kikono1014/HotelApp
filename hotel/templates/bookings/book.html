@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Бронювання номера {{ room.room_number }} ({{ room.get_room_type_display }})</h2>
+
+  <p><strong>Опис:</strong> {{ room.description }}</p>
+  <p><strong>Ціна за ніч:</strong> {{ room.price_per_night }} грн</p>
+
+  <h4>Доступні періоди для бронювання:</h4>
+  <ul>
+    {% for start, end in available_periods %}
+      <li>з {{ start }} по {{ end }}</li>
+    {% empty %}
+      <li>Немає доступних дат для бронювання</li>
+    {% endfor %}
+  </ul>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Забронювати</button>
+  </form>
+{% endblock %}

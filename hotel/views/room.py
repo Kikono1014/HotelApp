@@ -35,7 +35,7 @@ class RoomListView(ListView):
 
 class RoomDetailView(DetailView):
     model = Room
-    template_name = 'rooms/detail.html'
+    template_name = 'rooms/room_detail.html'
     context_object_name = 'room'
 
 @staff_member_required
