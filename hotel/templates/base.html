@@ -1,36 +1,24 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% block title %}
-    <title>My Site</title>
-    {% endblock %}
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    {% block extra_head %}{% endblock %}
+    <meta charset="UTF-8">
+    <title>{% block title %}Hotel Booking{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/rooms/">Rooms</a>
-        </nav>
-    </header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'index' %}">Hotel Booking</a>
+            <div>
+                <a href="{% url 'room_list' %}" class="btn btn-outline-primary me-2">Rooms</a>
+                <a href="{% url 'booking_list' %}" class="btn btn-outline-secondary me-2">All Bookings</a>
+            </div>
+        </div>
+    </nav>
 
-    <main>
+    <div class="container">
         {% block content %}
-        <!-- Default content can go here, or be empty -->
         {% endblock %}
-    </main>
-
-    <footer>
-        <p>&copy; HotelA</p>
-        {% block extra_footer %}{% endblock %}
-    </footer>
-
-    <script src="{% static 'js/main.js' %}"></script>
-    {% block scripts %}{% endblock %}
+    </div>
 </body>
 </html>

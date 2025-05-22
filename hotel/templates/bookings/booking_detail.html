@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Booking Details{% endblock %}
+{% block content %}
+<h2>Booking Details</h2>
+<p><strong>Room:</strong> {{ booking.room.name }}</p>
+<p><strong>Guest:</strong> {{ booking.guest.full_name }}</p>
+<p><strong>Check-in:</strong> {{ booking.check_in_date }}</p>
+<p><strong>Check-out:</strong> {{ booking.check_out_date }}</p>
+<p><strong>Status:</strong> {{ booking.status }}</p>
+<p><strong>Notes:</strong> {{ booking.notes }}</p>
+
+<a href="{% url 'booking_cancel' booking.pk %}" class="btn btn-danger">Cancel Booking</a>
+{% endblock %}

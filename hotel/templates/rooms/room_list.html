@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Rooms{% endblock %}
+{% block content %}
+<h2>Available Rooms</h2>
+<form method="get" class="mb-4">
+    {{ filter_form.as_p }}
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+<ul class="list-group">
+    {% for room in rooms %}
+        <li class="list-group-item">
+            <a href="{% url 'room_detail' room.pk %}">{{ room.name }}</a> - {{ room.room_type }} - ${{ room.price_per_night }} per night
+        </li>
+    {% empty %}
+        <li class="list-group-item">No rooms available.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
