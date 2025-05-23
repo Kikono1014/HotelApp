@@ -7,6 +7,17 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from ..models import Booking, Room, Guest
 from ..forms import BookingForm
+from django.views.generic.edit import FormView
+from ..forms import PhoneLoginForm
+
+
+class BookingLoginView(FormView):
+    template_name = 'bookings/login.html'
+    form_class = PhoneLoginForm
+
+    def form_valid(self, form):
+        phone = form.cleaned_data['phone']
+        return HttpResponseRedirect(f"/bookings/?phone={phone}")
 
 class BookingListView(ListView):
     model = Booking
@@ -15,7 +26,10 @@ class BookingListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Booking.objects.select_related('room', 'guest').order_by('-check_in_date')
+        phone = self.request.GET.get('phone')
+        if phone:
+            return Booking.objects.filter(guest__phone=phone).select_related('room', 'guest').order_by('-check_in_date')
+        return Booking.objects.none()
 
 class BookingDetailView(DetailView):
     model = Booking

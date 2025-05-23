@@ -2,7 +2,7 @@ from django.urls import path
 from hotel.views.room import RoomListView, RoomDetailView
 from .views.booking import (
     BookingCreateView, BookingListView, BookingDetailView,
-    BookingCancelView, 
+    BookingCancelView, BookingLoginView,
 )
 from hotel.views.home import HotelHomeView
 
@@ -16,4 +16,5 @@ urlpatterns = [
     path('rooms/<int:pk>/book/', BookingCreateView.as_view(), name='book_room'),
     path('bookings/', BookingListView.as_view(), name='booking_list'),
     path('bookings/<int:pk>/', BookingDetailView.as_view(), name='booking_detail'),
+    path('bookings/login/', BookingLoginView.as_view(), name='booking_login'),
 ]

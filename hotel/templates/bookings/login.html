@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Перегляд бронювань{% endblock %}
+{% block content %}
+  <h2>Введіть номер телефону для перегляду бронювань</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Переглянути</button>
+  </form>
+{% endblock %}

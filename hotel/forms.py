@@ -96,3 +96,7 @@ class BookingForm(forms.ModelForm):
                     raise forms.ValidationError("Room is not available for the selected dates.")
 
         return cleaned_data
+    
+
+class PhoneLoginForm(forms.Form):
+    phone = forms.CharField(label="Номер телефону", max_length=20)
