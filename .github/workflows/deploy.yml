@@ -1,0 +1,47 @@
+name: Build, Test & Deploy to Azure
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AZURE_WEBAPP_NAME: HotelApp
+  AZURE_RESOURCE_GROUP: HotelAppRG1
+  AZURE_APP_SERVICE_PLAN: HotelAppPlan
+  IMAGE_NAME: hotel-app
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.IMAGE_NAME }} .
+
+      - name: Run tests in Docker container
+        run: |
+          docker run --rm ${{ env.IMAGE_NAME }} python manage.py test --parallel
+
+  deploy-to-azure:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: Production
+          package: .
