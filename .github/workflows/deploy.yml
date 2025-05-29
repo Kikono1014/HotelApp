@@ -22,6 +22,7 @@ jobs:
         docker run --rm hotel-app python manage.py test --parallel
 
   build-and-deploy:
+    needs: build-and-test
     runs-on: ubuntu-latest
 
     steps:
